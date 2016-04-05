@@ -13,7 +13,7 @@ costForm = 'quadratic';
 
 if strcmp(costForm,'quadratic')
     u = x(5:6); % extract control/actuation sub-state
-    q = u*R*u' + x*Q*x';
+    q = u'*R*u + x'*Q*x;
 else
     error('OFC_ComputeCost: unknown form of cost function.\n');
 end

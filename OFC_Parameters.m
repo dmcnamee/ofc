@@ -1,7 +1,10 @@
-function OFC_Parameters(varargin)
-%% FUNCTION: Return parameters for OFC.
+function params = OFC_Parameters(varargin)
+%% FUNCTION: Globalizes and returns INDEPENDENT parameters for OFC.
 % INPUTS:   varargin  = {pass parameters explicitly}
-% OUTPUTS:  xinit     = initial position-velocity-actuator state of the system and goal-target positions, default = (0,...,0) column
+% OUTPUTS:  optThresh = diff threshold for iterative L/K optimization
+%           initDiff  = initial difference in L
+%           maxIter   = maximum number of iterations
+%           xinit     = initial position-velocity-actuator state of the system and goal-target positions, default = (0,...,0) column
 %           tinit     = initial time of system, default = 0
 %           mdim      = dimensionality of plane of movement, default = 2
 %           plim      = [-xlim +xlim;-ylim +ylim], default = [-15 15; 0 30]
@@ -38,14 +41,12 @@ function OFC_Parameters(varargin)
 %           Tgoal     = discrete times at which via-points-goals are traversed (assumed regular intervals)
 % NOTES:    N/A
 % ISSUES:   alim vs ulim?
-%           reset parameters to defaults.
-%           Output parameters as struct so can make a copy easily.
-%           Function to translate between discrete and continuous time -> argmin(abs(Tgoal(2)/2-T))
 % REFS:     Todorov2002 / Liu2007
 % AUTHOR:   Daniel McNamee, daniel.c.mcnamee@gmail.com
 
 %% set parameters as global variables
-clearvars -global;
+% clearvars -global;
+global optThresh initDiff maxIter;
 global xinit tinit mdim;
 global plim vlim ulim alim;
 global tres pres vres ures;
@@ -61,6 +62,14 @@ global T Tgoal;
 %% setup
 while ~isempty(varargin)
     switch varargin{1}
+        case 'params'
+            v2struct(varargin{2});
+        case 'optThresh'
+            optThresh = varargin{2};
+        case 'initDiff'
+            initDiff = varargin{2};
+        case 'maxIter'
+            maxIter = varargin{2};
         case 'xinit'
             xinit = varargin{2};
         case 'tinit'
@@ -134,6 +143,15 @@ while ~isempty(varargin)
 end
 
 %% defaults
+if isempty(optThresh)
+    optThresh = 0.0001;
+end
+if isempty(initDiff)
+    initDiff = 1;
+end
+if isempty(maxIter)
+    maxIter = 100;
+end
 if isempty(mdim)
     mdim = 2;
 end
@@ -230,22 +248,24 @@ if isempty(tinit)
 end
 
 %% dependent variables
-T       = tinit:tres:tmax;                          % discretized time-space
-tsteps  = numel(T);                                 % time resolution
-psteps  = (plim(:,2)-plim(:,1))/pres + 1;           % position resolution
-vsteps  = (vlim(:,2)-vlim(:,1))/vres + 1;           % velocity resolution
-usteps  = (ulim(:,2)-ulim(:,1))/ures + 1;           % control signal resolution
-C       = [c1 c2;-c2 c1];                           % signal-dependent noise matrix
-ngoal   = size(pgoal,1);                            % number of goal-targets
-xdim    = mdim*(3+ngoal);                           % dimensionality of state variable x
+OFC_GlobalVars();
+
+%% dependent defaults
 if isempty(Tgoal)
-    Tgoal = T(ceil((1:ngoal)*(tsteps/ngoal)));
+    Tgoal   = T(ceil((1:ngoal)*(tsteps/ngoal)));                % regular interval goal-times
 end
 if isempty(xinit)
-    xinit = [zeros(1,3*mdim) reshape(pgoal',1,ngoal*mdim)]';
+    xinit   = [zeros(1,3*mdim) reshape(pgoal',1,ngoal*mdim)]';  % initial state
 end
 if isempty(wgoal)
-    wgoal = ones(1,ngoal);
+    wgoal   = ones(1,ngoal);                                    % weights for goal-targets
 end
+
+%% save variables to struct
+params = ws2struct();
+try
+    params = rmfield(params,'varargin');
+end
+ 
 
 end

@@ -13,49 +13,45 @@ function [pi,Kpi,V] = OFC_LQGSDN_Elemental(x,A,B,C,H,O,R,Q)
 %           V   = expected cost-to-go
 % NOTES:    N/A
 % ISSUES:   Need to re-compute velocity/position based on stitched elemental LQRs.
-%           Update parameter management after outputing parameters as struct.
-%           Admit non-trivial chunking structure.
-%           Admit perturbations (zero Wstop?).
-%           Use wgoal instead of setting pgoal explicitly.
+%           Remove passing of R,Q since recomputed anyway?
+%           Absorb Elemental into Chunked code.
 % REFS:     Todorov2002* / Liu2007
 % AUTHOR:   Daniel McNamee, daniel.c.mcnamee@gmail.com
 
 %% variables
-global pgoal ngoal Tgoal;
+global tinit tmax Tgoal wgoal pgoal ngoal tsteps mdim xdim;
 dimpg   = size(pgoal,2);
 piE     = {};
 KpiE    = {};
+Chunks  = eye(ngoal,ngoal);
 
-%% make copies of variables describing all task constraints
-pgoalA = pgoal;
-ngoalA = ngoal;
-TgoalA = Tgoal;
+%% make copy of parameters
+params = OFC_Parameters();                      % assumes that parameters have already been specified
 
 %% solve elemental control problems
-tinit = 0;
 for g=1:ngoal
-    tmaxE      = TgoalA(g);
-    pgoalE     = squeeze(pgoalA(g,:))';
-    wgoalE     = zeros(1,ngoalA); wgoalE(g) = 1; % switch sub-goal on
-    OFC_Parameters('tinit',tinit,'tmax',tmaxE,'wgoal',wgoalE,'pgoal',pgoalA,'Tgoal',TgoalA);
-    [R,Q]      = OFC_LQG_costfunc();
-    [pi,Kpi,V] = OFC_LQGSDN(x,A,B,C,H,O,R,Q);
+    tmax       = Tgoal(g);
+    wgoal      = Chunks(g,:);                   % "switch on" single sub-goal only
+    OFC_GlobalVars();                           % re-compute global variables
+    [R,Q]      = OFC_LQG_costfunc();            % re-compute cost functions
+    [pi,Kpi,V] = OFC_LQGSDN(x,A,B,C,H,O,R,Q);   % run optimization
     piE{g}     = pi;
     KpiE{g}    = Kpi;
     VE(g)      = V;
-    x(1:dimpg) = pgoalE;       % set xinit for next trial to current via-point target position
-    tinit      = tmaxE;        % set tinit for next trial to current via-point target time
+    x(1:dimpg) = squeeze(pgoal(g,:))';          % set xinit for next trial to current via-point target position
+    tinit      = tmax;                          % set tinit for next trial to current via-point target time
 end
 
+%% restore parameters (tinit, tmax, wgoal)
+OFC_Parameters('params',params);
+
 %% stitch solutions together
-OFC_Parameters('pgoal',pgoalA);
-global ngoal tsteps mdim xdim;
 pi      = nan(mdim,xdim,tsteps);
 Kpi     = nan(xdim,xdim,tsteps);
-TIinit  = 1; % initial time index for each loop
+TIinit  = 1;                                    % initial time index for each loop
 for g=1:ngoal
     tstepsE     = size(KpiE{g},3);
-    Ti          = TIinit:TIinit+tstepsE-1;  % very ugly, find a better way
+    Ti          = TIinit:TIinit+tstepsE-1;      % very ugly, find a better way
     Kpi(:,:,Ti) = KpiE{g};
     pi(:,:,Ti)  = piE{g};
     TIinit      = TIinit + tstepsE;

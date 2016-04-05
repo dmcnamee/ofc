@@ -18,7 +18,7 @@ function [TX,QX] = OFC_RollOut(x,L,K,A,B,H,R,Q,varargin)
 % OUTPUTS:  TX          = time x state matrix
 %           QX          = time x cost matrix
 % NOTES:    N/A
-% ISSUES:   N/A
+% ISSUES:   Use Kalman filter for optimal estimation.
 % REFS:     Todorov2002
 % AUTHOR:   Daniel McNamee, daniel.c.mcnamee@gmail.com
 
@@ -52,9 +52,10 @@ end
 
 for ti=2:tsteps
     Lt          = squeeze(L(:,:,ti));                       % corresponding feedback control gain
-    x           = TX(:,ti-1)';                              % set current state
+    x           = TX(:,ti-1);                               % set current state
+    % optimal estimation using Kalman filter
     u           = -Lt*x;                                    % derive control input from control law
-    TX(ti,:)    = A*x + B*u;                                % update next state, no sampled noise
+    TX(:,ti)    = A*x + B*u;                                % update next state, no sampled noise
     if exist('Pert','var')
         [TX(:,ti),Pert] = OFC_ApplyPerturbation(ti,TX(:,ti),Pert);  % apply tstep-state perturbation
     end

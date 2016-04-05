@@ -12,25 +12,23 @@ function [pi,Kpi,V] = OFC_LQGSDN(x,A,B,C,H,O,R,Q)
 %           Kpi = optimal Kalman filter (LQE)
 %           V   = expected cost-to-go
 % NOTES:    N/A
-% ISSUES:   Move thresh/maxIter parameters to OFC_Parameters.
-%           Encode task-constraints as a struct.
-%           Change x to column vector.
+% ISSUES:   Use structures for dynamics matrices etc.
 % REFS:     Todorov2002* / Liu2007
 % AUTHOR:   Daniel McNamee, daniel.c.mcnamee@gmail.com
 
 %% variables
-global tsteps mdim xdim;
-thresh = 0.0001; diff = 1; maxIter = 100;
+global tsteps mdim xdim optThresh initDiff maxIter;
 L = zeros(mdim,xdim,tsteps);
 K = zeros(xdim,xdim,tsteps);
 Knew = zeros(mdim,xdim,tsteps); Lnew = zeros(mdim,xdim,tsteps);
 iter = 0;
+diff = initDiff;
 
 %% iterate
 tic;
 % figure(); hold on;
 % xlabel('Iteration $i$'); ylabel('Change in control law $L$, $|| L(i+1) - L(i) ||^2$');
-while (diff(end) > thresh) && (iter < maxIter)
+while (diff(end) > optThresh) && (iter < maxIter)
     iter = iter + 1;
     %fprintf('OFC_LQGSDN: diff(L) = %.3f, iteration %i...',diff,iter);
     % Kalman filter
