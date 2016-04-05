@@ -20,14 +20,14 @@ global tsteps xdim;
 
 %% setup variables
 Ge = zeros(xdim,xdim);                      % expected estimation error covariance (initialized to zero covariance)
-Gx = x'*x;                                  % non-centered covariance of state estimation
-K  = nan(tsteps,xdim,xdim);
+Gx = x*x';                                  % non-centered covariance of state estimation
+K  = nan(xdim,xdim,tsteps);
 
 %% forward-time-sweep calculation
 for ti=1:tsteps
-    Lt = squeeze(L(ti,:,:));                % corresponding feedback control gain
+    Lt = squeeze(L(:,:,ti));                % corresponding feedback control gain
     Kt        = A*Ge*H'*((H*Ge*H' + O)^-1); % update Kalman gain
-    K(ti,:,:) = Kt;
+    K(:,:,ti) = Kt;
     Ge = (A-Kt*H)*Ge*A';                    % update estimation covariance update
     for i=1:2
         Ci = squeeze(C(i,:,:));
@@ -41,7 +41,7 @@ for ti=1:tsteps
 end
 
 %% output error variance components
-Gx1 = x'*x;
+Gx1 = x*x';
 Ge1 = zeros(xdim,xdim); % initialized to zero covariance
 
 end

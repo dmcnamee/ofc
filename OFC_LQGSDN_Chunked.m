@@ -36,28 +36,28 @@ tinit = 0;
 for c=1:nchunk
     g          = find(Chunks(c,:),1,'last');
     tmaxC      = TgoalA(g);
-    wgoalC     = Chunks(c,:);  % "switch on" sub-goals in chunk
+    wgoalC     = Chunks(c,:);             % "switch on" sub-goals in chunk
     OFC_Parameters('tinit',tinit,'tmax',tmaxC,'wgoal',wgoalC,'pgoal',pgoalA,'Tgoal',TgoalA);
     [R,Q]      = OFC_LQG_costfunc();
     [pi,Kpi,V] = OFC_LQGSDN(x,A,B,C,H,O,R,Q);
     piC{c}     = pi;
     KpiC{c}    = Kpi;
     VC(c)      = V;
-    x(1:dimpg) = squeeze(pgoalA(g,:));    % set xinit for next trial to current via-point target position
+    x(1:dimpg) = squeeze(pgoalA(g,:))';   % set xinit for next trial to current via-point target position
     tinit      = tmaxC;                   % set tinit for next trial to current via-point target time
 end
 
 %% stitch solutions together
 OFC_Parameters('pgoal',pgoalA,'Tgoal',TgoalA);
 global tsteps mdim xdim;
-pi      = nan(tsteps,mdim,xdim);
-Kpi     = nan(tsteps,xdim,xdim);
+pi      = nan(mdim,xdim,tsteps);
+Kpi     = nan(xdim,xdim,tsteps);
 TIinit  = 1; % initial time index for each loop
 for c=1:nchunk
-    tstepsC     = size(KpiC{c},1);
+    tstepsC     = size(KpiC{c},3);
     Ti          = TIinit:TIinit+tstepsC-1;  % very ugly, find a better way
-    Kpi(Ti,:,:) = KpiC{c};
-    pi(Ti,:,:)  = piC{c};
+    Kpi(:,:,Ti) = KpiC{c};
+    pi(:,:,Ti)  = piC{c};
     TIinit      = TIinit + tstepsC;
 end
 

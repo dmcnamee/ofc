@@ -38,25 +38,25 @@ if ~exist('plot','var')
     plot = false;
 end
 global tsteps T mdim xdim;
-TX = zeros(tsteps,xdim);    % discretized time/state-space
+TX = zeros(xdim,tsteps);    % discretized time/state-space
 if numel(x)==mdim           % extend to include target positions
     global xinit;
-    x = [x xinit(3*mdim+1:xdim)];
+    x = [x xinit(3*mdim+1:xdim)]';
 end
 
 %% init time/state-space
-TX(1,:)        = x;
+TX(:,1)        = x;
 if exist('Pert','var')
-    [TX(1,:),Pert] = OFC_ApplyPerturbation(1,TX(1,:),Pert);     % apply perturbation
+    [TX(:,1),Pert] = OFC_ApplyPerturbation(1,TX(:,1),Pert);     % apply perturbation
 end
 
 for ti=2:tsteps
-    Lt          = squeeze(L(ti,:,:));                       % corresponding feedback control gain
-    x           = TX(ti-1,:)';                              % set current state
+    Lt          = squeeze(L(:,:,ti));                       % corresponding feedback control gain
+    x           = TX(:,ti-1)';                              % set current state
     u           = -Lt*x;                                    % derive control input from control law
     TX(ti,:)    = A*x + B*u;                                % update next state, no sampled noise
     if exist('Pert','var')
-        [TX(ti,:),Pert] = OFC_ApplyPerturbation(ti,TX(ti,:),Pert);  % apply tstep-state perturbation
+        [TX(:,ti),Pert] = OFC_ApplyPerturbation(ti,TX(:,ti),Pert);  % apply tstep-state perturbation
     end
     
     if any(isnan(TX(:)))
@@ -65,10 +65,10 @@ for ti=2:tsteps
 end
 
 %% compute cost trajectory
-QX = zeros(tsteps,1);
+QX = zeros(1,tsteps);
 for ti=1:tsteps
     Qt     = OFC_TaskConstraintCostMatrix(T(ti),Q);
-    QX(ti) = OFC_ComputeCost(TX(ti,:),R,Qt);
+    QX(ti) = OFC_ComputeCost(TX(:,ti),R,Qt);
 end
 
 %% output diagnostics

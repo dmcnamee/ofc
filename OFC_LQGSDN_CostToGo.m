@@ -13,6 +13,6 @@ function V = OFC_LQGSDN_CostToGo(x,Gx,Ge,Sx,Se,s)
 % REFS:     Todorov2005 (just after Eqn 4.2)
 % AUTHOR:   Daniel McNamee, daniel.c.mcnamee@gmail.com
 
-V = x*Sx*x' + trace((Sx+Se)*Ge) + s;
+V = x'*Sx*x + trace((Sx+Se)*Ge) + s;
 
 end

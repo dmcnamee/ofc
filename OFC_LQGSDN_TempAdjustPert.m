@@ -9,11 +9,11 @@
 %% variables
 clear all; close all; clc;
 OFC_Parameters();
-pgoal1      = [0 10];
-pgoal2      = [0 10; -5 10];
-% pgoal3      = [0 10; -5 20; -5 10];
-% pgoal3      = [0 10; -5 10; -5 0];
-pgoal3      = [0 10; -5 0; -10 0];
+pgoal1      = [0 10]';
+pgoal2      = [0 10; -5 10]';
+% pgoal3      = [0 10; -5 20; -5 10]';
+% pgoal3      = [0 10; -5 10; -5 0]';
+pgoal3      = [0 10; -5 0; -10 0]';
 pgoal       = pgoal2;
 OFC_Parameters('pgoal',pgoal);
 Chunks2     = [1 1];
@@ -29,10 +29,10 @@ tiStitch    = 6;            % perturbation tstep
 x           = xinit;
 
 % define state-based perturbation
-Pert.C.X      = nan(1,xdim);
+Pert.C.X      = nan(xdim,1);
 Pert.Th.X(1)  = 1.0;
 Pert.C.X(1,2) = 1;               % if norm(y,5)<pres
-Pert.P.X      = zeros(1,xdim);
+Pert.P.X      = zeros(xdim,1);
 %Pert.P.X(1)   = -1;             % perturb px
 Pert.P.X(3)   = -10;             % perturb vx
 
@@ -63,18 +63,18 @@ Pert.P.X(3)   = -10;             % perturb vx
 %         [TXC,QXC]   = OFC_RollOut(x,piC,KpiC,A,B,H,R,Q);
 % 
 %         % record results
-%         QTg(ti1,ti2,1) = nansum(QXE);
-%         QTg(ti1,ti2,2) = nansum(QXC);
+%         QTg(1,ti1,ti2) = nansum(QXE);
+%         QTg(2,ti1,ti2) = nansum(QXC);
 %     end
 % end
 % subplot(2,2,1); hold on;
-% plot(QTg(:,1),QTg(:,2),'.-');
+% plot(QTg(1,:),QTg(2,:),'.-');
 % xlabel('Cumulative cost for elemental OFC');
 % ylabel('Cumulative cost for chunked OFC');
 % title('Unperturbed Trajectory');
 % subplot(2,2,2); hold on;
-% plot(Tgoal1Range,QTg(:,1),'.-');
-% plot(Tgoal1Range,QTg(:,2),'.-');
+% plot(Tgoal1Range,QTg(1,:),'.-');
+% plot(Tgoal1Range,QTg(2,:),'.-');
 % xlabel('Time to target 1 (s)');
 % ylabel('Cumulative cost');
 % legend('Elemental OFC','2+1 Chunked OFC');
@@ -83,13 +83,13 @@ Pert.P.X(3)   = -10;             % perturb vx
 %% perturbed version goes here
 
 % subplot(2,2,3); hold on;
-% plot(QTg(:,1),QTg(:,2),'.-');
+% plot(QTg(1,:),QTg(2,:),'.-');
 % xlabel('Cumulative cost for elemental OFC');
 % ylabel('Cumulative cost for chunked OFC');
 % title('Perturbed Trajectory');
 % subplot(2,2,4); hold on;
-% plot(Tgoal1Range,QTg(:,1),'.-');
-% plot(Tgoal1Range,QTg(:,2),'.-');
+% plot(Tgoal1Range,QTg(1,:),'.-');
+% plot(Tgoal1Range,QTg(2,:),'.-');
 % xlabel('Time to target 1 (s)');
 % ylabel('Cumulative cost');
 % title('Perturbed Trajectory');
@@ -116,12 +116,12 @@ for ti1=1:numel(Tgoal1Range)
         [TXE,QXE] = OFC_RollOut(x,piE,KpiE,A,B,H,R,Q);
 
         % record results
-        QTg(ti1,ti2,1) = nansum(QXE);
-        QTg(ti1,ti2,2) = nansum(QXC);
+        QTg(1,ti1,ti2) = nansum(QXE);
+        QTg(2,ti1,ti2) = nansum(QXC);
     end
 end
-[T1E,T2E] = ind2sub(size(QTg(:,:,1)),argmin(QTg(:,:,1)));
-[T1C,T2C] = ind2sub(size(QTg(:,:,2)),argmin(QTg(:,:,2)));
+[T1E,T2E] = ind2sub(size(QTg(1,:,:)),argmin(QTg(1,:,:)));
+[T1C,T2C] = ind2sub(size(QTg(2,:,:)),argmin(QTg(2,:,:)));
 t1EOpt = Tgoal1Range(T1E); t2EOpt = Tgoal2Range(T2E);
 t1COpt = Tgoal1Range(T1C); t2COpt = Tgoal2Range(T2C);
 
@@ -154,39 +154,39 @@ for ti1=1:numel(Tgoal1Range)
         [TXE,QXE] = OFC_RollOut(x,piE,KpiE,A,B,H,R,Q,'Perturbations',Pert);
 
         % record results
-        QTgP(ti1,ti2,1) = nansum(QXE);
-        QTgP(ti1,ti2,2) = nansum(QXC);
+        QTgP(1,ti1,ti2) = nansum(QXE);
+        QTgP(2,ti1,ti2) = nansum(QXC);
     end
 end
-[T1E,T2E] = ind2sub(size(QTg(:,:,1)),argmin(QTg(:,:,1)));
-[T1C,T2C] = ind2sub(size(QTg(:,:,2)),argmin(QTg(:,:,2)));
-[T1EP,T2EP] = ind2sub(size(QTgP(:,:,1)),argmin(QTgP(:,:,1)));
-[T1CP,T2CP] = ind2sub(size(QTgP(:,:,2)),argmin(QTgP(:,:,2)));
+[T1E,T2E] = ind2sub(size(QTg(1,:,:)),argmin(QTg(1,:,:)));
+[T1C,T2C] = ind2sub(size(QTg(2,:,:)),argmin(QTg(2,:,:)));
+[T1EP,T2EP] = ind2sub(size(QTgP(1,:,:)),argmin(QTgP(1,:,:)));
+[T1CP,T2CP] = ind2sub(size(QTgP(2,:,:)),argmin(QTgP(2,:,:)));
 [XTg,YTg] = meshgrid(Tgoal1Range,Tgoal2Range);
 subplot(2,2,1); hold on;
-surface(XTg,YTg,QTg(:,:,1)');
-scatter3(Tgoal1Range(T1E),Tgoal2Range(T2E),argmin(QTg(:,:,1)));
+surface(XTg,YTg,QTg(1,:,:)');
+scatter3(Tgoal1Range(T1E),Tgoal2Range(T2E),argmin(QTg(1,:,:)));
 title('Elemental | No Perturbation');
 zlabel('Cumulative Cost');
 xlim([Tgoal1Range(1) Tgoal1Range(end)]);
 ylim([Tgoal2Range(1) Tgoal2Range(end)]);
 subplot(2,2,2); hold on;
-surface(XTg,YTg,QTg(:,:,2)');
-scatter3(Tgoal1Range(T1C),Tgoal2Range(T2C),argmin(QTg(:,:,2)));
+surface(XTg,YTg,QTg(2,:,:)');
+scatter3(Tgoal1Range(T1C),Tgoal2Range(T2C),argmin(QTg(2,:,:)));
 title('Chunked | No Perturbation');
 zlabel('Cumulative Cost');
 xlim([Tgoal1Range(1) Tgoal1Range(end)]);
 ylim([Tgoal2Range(1) Tgoal2Range(end)]);
 subplot(2,2,3); hold on;
-surface(XTg,YTg,QTgP(:,:,1)');
-scatter3(Tgoal1Range(T1EP),Tgoal2Range(T2EP),argmin(QTgP(:,:,1)));
+surface(XTg,YTg,QTgP(1,:,:)');
+scatter3(Tgoal1Range(T1EP),Tgoal2Range(T2EP),argmin(QTgP(1,:,:)));
 title('Elemental | Perturbation');
 zlabel('Cumulative Cost');
 xlim([Tgoal1Range(1) Tgoal1Range(end)]);
 ylim([Tgoal2Range(1) Tgoal2Range(end)]);
 subplot(2,2,4); hold on;
-surface(XTg,YTg,QTgP(:,:,2)');
-scatter3(Tgoal1Range(T1EP),Tgoal2Range(T2EP),argmin(QTgP(:,:,2)));
+surface(XTg,YTg,QTgP(2,:,:)');
+scatter3(Tgoal1Range(T1EP),Tgoal2Range(T2EP),argmin(QTgP(2,:,:)));
 title('Chunked | Perturbation');
 zlabel('Cumulative Cost');
 xlim([Tgoal1Range(1) Tgoal1Range(end)]);

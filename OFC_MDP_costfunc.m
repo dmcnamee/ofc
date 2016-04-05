@@ -6,6 +6,7 @@ function J = ofc_MDP_costfunc(u,p,v,t)
 %           t   = time point.
 % OUTPUTS:  N/A
 % NOTES:    N/A
+% ISSUES:   Incomplete.
 % REFS:     Todorov2002 / Liu2007* / Nashed2012 / Nashed2014
 % AUTHOR:   Daniel McNamee, daniel.c.mcnamee@gmail.com
 % ISSUES:   How to prevent optimal controller sticking at target? vmin?

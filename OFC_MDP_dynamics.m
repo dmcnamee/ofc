@@ -9,6 +9,7 @@ function [Ppmf,Upmf] = ofc_MDP_dynamics(U)
 % OUTPUTS:  Ppmf = distribution over position/velocity space for next timestep
 %           Upmf = distribution over control signal (due to signal-dependent noise)
 % NOTES:    N/A
+% ISSUES:   Incomplete.
 % REFS:     Todorov2002 / Liu2007* / Nashed2012 / Nashed2014
 % AUTHOR:   Daniel McNamee, daniel.c.mcnamee@gmail.com
 

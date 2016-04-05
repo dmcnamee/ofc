@@ -2,6 +2,7 @@
 % Inputs:   N/A
 % OUTPUTS:  N/A
 % NOTES:    N/A
+% ISSUES:   Incomplete.
 % REFS:     Todorov2002 / Liu2007* / Nashed2012 / Nashed2014
 % AUTHOR:   Daniel McNamee, daniel.c.mcnamee@gmail.com
 % TOOLBOXES:    Control Systems Toolbox (http://uk.mathworks.com/products/control/)

@@ -48,9 +48,9 @@ for i=1:3
     subplot(2,2,i); hold on;
     name = names{i}; unit = units{i};
     
-    %plot(TX(:,ind(i,1)),TX(:,ind(i,2)),'LineColor',TrajColor,varargin{:});                                     % 2D
-    plot_GradientLine(TX(:,ind(i,1)),TX(:,ind(i,2)),T','z',T',varargin{:}); rotate3d on; zlabel('Time (s)');    % 3D, line color = time
-    %plot3(TX(:,ind(i,1)),TX(:,ind(i,2)),T',varargin{:}); rotate3d on; zlabel('Time (s)');                      % 3D
+    %plot(TX(ind(i,1),:),TX(ind(i,2),:),'LineColor',TrajColor,varargin{:});                                     % 2D
+    plot_GradientLine(TX(ind(i,1),:),TX(ind(i,2),:),T','z',T',varargin{:}); rotate3d on; zlabel('Time (s)');    % 3D, line color = time
+    %plot3(TX(ind(i,1),:),TX(ind(i,2),:),T',varargin{:}); rotate3d on; zlabel('Time (s)');                      % 3D
     xlabel(sprintf('X %s (%s)',name,unit)); ylabel(sprintf('Y %s (%s)',name,unit));
     title(name);
     if strcmp(name,'Position')
@@ -59,8 +59,8 @@ for i=1:3
             %scatter(pgoal(n,1),pgoal(n,2));
             scatter3(pgoal(n,1),pgoal(n,2),Tgoal(n));
         end
-        scatter(TX(1,1),TX(1,2),'.');
-        scatter3(TX(1,1),TX(1,2),0,'.'); % plot start position
+        scatter(TX(1,1),TX(2,1),'.');
+        scatter3(TX(1,1),TX(2,1),0,'.'); % plot start position
     end  
 end
 colorbar();

@@ -1,7 +1,7 @@
 function OFC_Parameters(varargin)
 %% FUNCTION: Return parameters for OFC.
 % INPUTS:   varargin  = {pass parameters explicitly}
-% OUTPUTS:  xinit     = initial position-velocity-actuator state of the system and goal-target positions, default = (0,...,0)
+% OUTPUTS:  xinit     = initial position-velocity-actuator state of the system and goal-target positions, default = (0,...,0) column
 %           tinit     = initial time of system, default = 0
 %           mdim      = dimensionality of plane of movement, default = 2
 %           plim      = [-xlim +xlim;-ylim +ylim], default = [-15 15; 0 30]
@@ -242,7 +242,7 @@ if isempty(Tgoal)
     Tgoal = T(ceil((1:ngoal)*(tsteps/ngoal)));
 end
 if isempty(xinit)
-    xinit = [zeros(1,3*mdim) reshape(pgoal',1,ngoal*mdim)];
+    xinit = [zeros(1,3*mdim) reshape(pgoal',1,ngoal*mdim)]';
 end
 if isempty(wgoal)
     wgoal = ones(1,ngoal);

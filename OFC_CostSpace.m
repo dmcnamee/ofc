@@ -22,7 +22,7 @@ for pi1=1:psteps
             for vi2=1:vsteps
                 for ui1=1:usteps
                     for ui2=1:usteps
-                        x = S(pi1,pi2,vi1,vi2,ui1,ui2,:);
+                        x = S(:,pi1,pi2,vi1,vi2,ui1,ui2);
                         QS(pi1,pi2,vi1,vi2,ui1,ui2) = OFC_ComputeCost(x,R,Q);
                     end
                 end

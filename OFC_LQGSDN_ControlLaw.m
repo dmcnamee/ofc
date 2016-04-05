@@ -27,19 +27,19 @@ global tsteps ngoal xdim mdim T;
 Sxt = squeeze(Q(ngoal,:,:));                    % component of cost-to-go due to state (init. to final goal-target)
 Set = zeros(xdim,xdim);                         % component of cost-to-go due to estimation error (init. to zero)
 st  = 0;                                        % component of cost-to-go due to independent noise sources
-L   = nan(tsteps,mdim,xdim);
+L   = nan(mdim,xdim,tsteps);
 
 %% backward-time-sweep calculation
 for ti=fliplr(1:tsteps)
     t  = T(ti);                                 % time
-    Kt = squeeze(K(ti,:,:));                    % corresponding Kalman gain
+    Kt = squeeze(K(:,:,ti));                    % corresponding Kalman gain
     Lt = B'*Sxt*B + R;                          % update feedback gain
     for i=1:2
         Ci = squeeze(C(i,:,:));
         Lt = Lt + Ci'*(Sxt+Set)*Ci;
     end
     Lt        = (Lt^-1)*B'*Sxt*A;
-    L(ti,:,:) = Lt;
+    L(:,:,ti) = Lt;
     Qt  = OFC_TaskConstraintCostMatrix(t,Q);    % update cost-to-go matrices
     Sxt = Qt + A'*Sxt*(A-B*Lt);
     Set = A'*Sxt*B*Lt + (A-Kt*H)'*Set*(A-Kt*H);

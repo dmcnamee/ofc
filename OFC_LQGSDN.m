@@ -21,9 +21,9 @@ function [pi,Kpi,V] = OFC_LQGSDN(x,A,B,C,H,O,R,Q)
 %% variables
 global tsteps mdim xdim;
 thresh = 0.0001; diff = 1; maxIter = 100;
-L = zeros(tsteps,mdim,xdim);
-K = zeros(tsteps,xdim,xdim);
-Knew = zeros(tsteps,mdim,xdim); Lnew = zeros(tsteps,mdim,xdim);
+L = zeros(mdim,xdim,tsteps);
+K = zeros(xdim,xdim,tsteps);
+Knew = zeros(mdim,xdim,tsteps); Lnew = zeros(mdim,xdim,tsteps);
 iter = 0;
 
 %% iterate

@@ -22,7 +22,7 @@ B       = zeros(xdim,mdim);
 B(5,1)  = 1; B(6,2) = 1;                         % control-signal input to actuator update
 
 %% signal-dependent noise (adapted from [Liu2007])
-C       = zeros(2,xdim,mdim);
+C        = zeros(2,xdim,mdim);
 C(1,:,:) = B*[c1 0; 0 c1];
 C(2,:,:) = B*[0 c2; -c2 0];
 

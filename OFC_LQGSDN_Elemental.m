@@ -34,11 +34,11 @@ TgoalA = Tgoal;
 %% solve elemental control problems
 tinit = 0;
 for g=1:ngoal
-    tmaxE    = TgoalA(g);
-    pgoalE   = squeeze(pgoalA(g,:));
-    wgoalE   = zeros(1,ngoalA); wgoalE(g) = 1; % switch sub-goal on
+    tmaxE      = TgoalA(g);
+    pgoalE     = squeeze(pgoalA(g,:))';
+    wgoalE     = zeros(1,ngoalA); wgoalE(g) = 1; % switch sub-goal on
     OFC_Parameters('tinit',tinit,'tmax',tmaxE,'wgoal',wgoalE,'pgoal',pgoalA,'Tgoal',TgoalA);
-    [R,Q]    = OFC_LQG_costfunc();
+    [R,Q]      = OFC_LQG_costfunc();
     [pi,Kpi,V] = OFC_LQGSDN(x,A,B,C,H,O,R,Q);
     piE{g}     = pi;
     KpiE{g}    = Kpi;
@@ -50,14 +50,14 @@ end
 %% stitch solutions together
 OFC_Parameters('pgoal',pgoalA);
 global ngoal tsteps mdim xdim;
-pi      = nan(tsteps,mdim,xdim);
-Kpi     = nan(tsteps,xdim,xdim);
+pi      = nan(mdim,xdim,tsteps);
+Kpi     = nan(xdim,xdim,tsteps);
 TIinit  = 1; % initial time index for each loop
 for g=1:ngoal
-    tstepsE     = size(KpiE{g},1);
+    tstepsE     = size(KpiE{g},3);
     Ti          = TIinit:TIinit+tstepsE-1;  % very ugly, find a better way
-    Kpi(Ti,:,:) = KpiE{g};
-    pi(Ti,:,:)  = piE{g};
+    Kpi(:,:,Ti) = KpiE{g};
+    pi(:,:,Ti)  = piE{g};
     TIinit      = TIinit + tstepsE;
 end
 

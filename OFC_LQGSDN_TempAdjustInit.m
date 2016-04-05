@@ -9,11 +9,11 @@
 %% variables
 % clear all; close all; clc;
 OFC_Parameters();
-pgoal1      = [0 10];
-pgoal2      = [0 10; -5 10];
-% pgoal3      = [0 10; -5 20; -5 10];
-% pgoal3      = [0 10; -5 10; -5 0];
-pgoal3      = [0 10; -5 0; -10 0];
+pgoal1      = [0 10]';
+pgoal2      = [0 10; -5 10]';
+% pgoal3      = [0 10; -5 20; -5 10]';
+% pgoal3      = [0 10; -5 10; -5 0]';
+pgoal3      = [0 10; -5 0; -10 0]';
 pgoal       = pgoal2;
 OFC_Parameters('pgoal',pgoal); global xdim;
 Chunks2     = [1 1];
@@ -24,8 +24,8 @@ Tgoal2Range = 0.55:0.02:1.15; % range of Tgoal(2) to test
 Tgoal3Range = 1.0:0.02:1.0;  % range of Tgoal(3) to test
 
 % define different initial states
-xinit1 = zeros(1,xdim);
-xinit2 = zeros(1,xdim);
+xinit1 = zeros(xdim,1);
+xinit2 = zeros(xdim,1);
 xinit2(4) = -10;
 
 % dynamics
@@ -49,8 +49,8 @@ for ti=1:numel(Tgoal1Range)
     [piC,KpiC,VC]  = OFC_LQGSDN_Chunked(Chunks,xinit,A,B,C,H,O,R,Q);
     
     % record results
-    QT(ti,1,1) = VE;
-    QT(ti,1,2) = VC;
+    QT(1,1,ti) = VE;
+    QT(1,2,ti) = VC;
 end
 
 % % perturbed initial state
@@ -69,21 +69,21 @@ end
 %     [piC,KpiC,VC]  = OFC_LQGSDN_Chunked(Chunks,xinit,A,B,C,H,O,R,Q);
 %     
 %     % record results
-%     QT(ti,2,1) = VE;
-%     QT(ti,2,2) = VC;
+%     QT(2,1,ti) = VE;
+%     QT(2,2,ti) = VC;
 % end
 
 % QT = tstep x xinit x E/C
-T1E = argmin(QT(:,1,1));
-T1C = argmin(QT(:,1,2));
-% T2E = argmin(QT(:,2,1));
-% T2C = argmin(QT(:,2,2));
+T1E = argmin(QT(1,1,:));
+T1C = argmin(QT(1,2,:));
+% T2E = argmin(QT(2,1,:));
+% T2C = argmin(QT(2,2,:));
 
 figure(); hold on;
-plot(Tgoal1Range,squeeze(QT(:,1,1)),'.-');
-% plot(Tgoal1Range,squeeze(QT(:,1,2)),'.-');
-% plot(Tgoal1Range,squeeze(QT(:,2,1)),'.-');
-% plot(Tgoal1Range,squeeze(QT(:,2,2)),'.-');
+plot(Tgoal1Range,squeeze(QT(1,1,:)),'.-');
+% plot(Tgoal1Range,squeeze(QT(1,2,:)),'.-');
+% plot(Tgoal1Range,squeeze(QT(2,1,:)),'.-');
+% plot(Tgoal1Range,squeeze(QT(2,2,:)),'.-');
 xlabel('Target 1 time (s)'); ylabel('Expected cumulative cost');
 legend('xinit1, E', 'xinit1, C', 'xinit2 E', 'xinit2 C');
 title('OT | Perturbation | Temporal Adjustment');
