@@ -30,16 +30,18 @@ params = OFC_Parameters();                      % assumes that parameters have a
 
 %% solve elemental control problems
 for g=1:ngoal
-    tmax       = Tgoal(g);
-    wgoal      = Chunks(g,:);                   % "switch on" single sub-goal only
-    OFC_GlobalVars();                           % re-compute global variables
-    [R,Q]      = OFC_LQG_costfunc();            % re-compute cost functions
-    [pi,Kpi,V] = OFC_LQGSDN(x,A,B,C,H,O,R,Q);   % run optimization
-    piE{g}     = pi;
-    KpiE{g}    = Kpi;
-    VE(g)      = V;
-    x(1:dimpg) = squeeze(pgoal(g,:))';          % set xinit for next trial to current via-point target position
-    tinit      = tmax;                          % set tinit for next trial to current via-point target time
+    tmax        = Tgoal(g);
+    wgoal       = Chunks(g,:);                   % "switch on" single sub-goal only
+    OFC_GlobalVars();                            % re-compute global variables
+    [R,Q]       = OFC_LQG_costfunc();            % re-compute cost functions
+    [pi,Kpi,V]  = OFC_LQGSDN(x,A,B,C,H,O,R,Q);   % run optimization
+    piE{g}      = pi;
+    KpiE{g}     = Kpi;
+    VE(g)       = V;
+%     x(1:dimpg)  = squeeze(pgoal(g,:))';              % set xinit for next element to current via-point target position
+    [TX,~]      = OFC_RollOut(x,pi,Kpi,A,B,H,R,Q);   % roll out control policy
+    x(1:3*mdim) = TX(1:3*mdim,end);                  % set init for next element to final state of current
+    tinit       = tmax;                              % set tinit for next trial to current via-point target time
 end
 
 %% restore parameters (tinit, tmax, wgoal)

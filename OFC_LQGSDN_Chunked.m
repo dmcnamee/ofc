@@ -30,17 +30,19 @@ params = OFC_Parameters();                      % assumes that parameters have a
 
 %% solve chunked control problems
 for c=1:nchunk
-    g          = find(Chunks(c,:),1,'last');
-    tmax       = Tgoal(g);                      % set tmax to time of goal ending chunk
-    wgoal      = Chunks(c,:);                   % "switch on" sub-goals in chunk only
-    OFC_GlobalVars();                           % re-compute global variables
-    [R,Q]      = OFC_LQG_costfunc();            % re-compute cost functions
-    [pi,Kpi,V] = OFC_LQGSDN(x,A,B,C,H,O,R,Q);   % run optimization
-    piC{c}     = pi;
-    KpiC{c}    = Kpi;
-    VC(c)      = V;
-    x(1:dimpg) = squeeze(pgoal(g,:))';          % set xinit for next trial to current via-point target position
-    tinit      = tmax;                          % set tinit for next trial to current via-point target time
+    g           = find(Chunks(c,:),1,'last');
+    tmax        = Tgoal(g);                         % set tmax to time of goal ending chunk
+    wgoal       = Chunks(c,:);                      % "switch on" sub-goals in chunk only
+    OFC_GlobalVars();                               % re-compute global variables
+    [R,Q]       = OFC_LQG_costfunc();               % re-compute cost functions
+    [pi,Kpi,V]  = OFC_LQGSDN(x,A,B,C,H,O,R,Q);      % run optimization
+    piC{c}      = pi;
+    KpiC{c}     = Kpi;
+    VC(c)       = V;
+%     x(1:dimpg)  = squeeze(pgoal(g,:))';             % set xinit for next trial to current via-point target position
+    [TX,~]      = OFC_RollOut(x,pi,Kpi,A,B,H,R,Q);  % roll out control policy
+    x(1:3*mdim) = TX(1:3*mdim,end);                 % set init for next element to final state of current
+    tinit       = tmax;                             % set tinit for next trial to current via-point target time
 end
 
 %% restore parameters (tinit, tmax, wgoal)

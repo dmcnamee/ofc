@@ -9,7 +9,7 @@ function vars = OFC_GlobalVars()
 %           ngoal   = number of goal-targets
 %           xdim    = dimensionality of state variable x
 % NOTES:    N/A
-% ISSUES:   alim vs ulim?
+% ISSUES:   N/A
 % REFS:     Todorov2002 / Liu2007
 % AUTHOR:   Daniel McNamee, daniel.c.mcnamee@gmail.com
 
