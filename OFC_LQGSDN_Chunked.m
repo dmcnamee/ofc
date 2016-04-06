@@ -1,5 +1,5 @@
 function [pi,Kpi,V] = OFC_LQGSDN_Chunked(Chunks,x,A,B,C,H,O,R,Q)
-%% FUNCTION: OFC LQGSDN ViaPoint problem solved as sequence of elemental movements.
+%% FUNCTION: OFC LQGSDN ViaPoint problem solved as sequence of chunked movements.
 % INPUTS:   Chunks = indicator matrix describing chunks/elementals (#chunks x #goals)
 %           x = initial state of system
 %           A = state-evolution matrix
