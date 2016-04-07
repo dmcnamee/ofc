@@ -55,4 +55,9 @@ Sx1 = Sxt;
 Se1 = Set;
 s1  = st;
 
+%% checks
+if any(isnan(L(:)))
+    error('OFC_LQGSDN_ControlLaw: nan returned.');
+end
+
 end

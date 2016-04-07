@@ -45,10 +45,9 @@ if isfield(Pert,'C')
 
     %% state-constraint based perturbations
     if isfield(Pert.C,'X')
-        npertX = size(Pert.C.X);
+        npertX = size(Pert.C.X,2);
         for pi=1:npertX
             ind = ~isnan(Pert.C.X(:,pi));                       % ignores nans in comparison
-            %disp(norm(Pert.C.X(ind,pi)-x(ind)))
             if norm(Pert.C.X(ind,pi)-x(ind)) < Pert.Th.X(pi);   % threshold parameter
                 xpert          = xpert + Pert.P.X(:,pi);
                 Pert.C.X(:,pi) = [];                            % remove applied perturbation

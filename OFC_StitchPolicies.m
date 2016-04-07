@@ -16,8 +16,8 @@ if (isequal(size(L1),size(L2))&&isequal(size(K1),size(K2)))
     K = K1; K(:,:,ti+1:end) = K2(:,:,ti+1:end);
 else
     % stitch for different number of tsteps
-    L = L1; L(:,:,ti+1:size(L2,1)) = L2(:,:,ti+1:end);
-    K = K1; K(:,:,ti+1:size(K2,1)) = K2(:,:,ti+1:end);
+    L = L1; L(:,:,ti+1:size(L2,3)) = L2(:,:,ti+1:end);
+    K = K1; K(:,:,ti+1:size(K2,3)) = K2(:,:,ti+1:end);
     disp('warning: L/K arrays of unequal size, maybe different tsteps.');
 end
 

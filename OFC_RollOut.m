@@ -47,15 +47,15 @@ end
 %% init time/state-space
 TX(:,1)        = x;
 if exist('Pert','var')
-    [TX(:,1),Pert] = OFC_ApplyPerturbation(1,TX(:,1),Pert);     % apply perturbation
+    [TX(:,1),Pert] = OFC_ApplyPerturbation(1,TX(:,1),Pert);         % apply perturbation
 end
 
 for ti=2:tsteps
-    Lt          = squeeze(L(:,:,ti));                       % corresponding feedback control gain
-    x           = TX(:,ti-1);                               % set current state
+    Lt          = squeeze(L(:,:,ti));                               % corresponding feedback control gain
+    x           = TX(:,ti-1);                                       % set current state
     % optimal estimation using Kalman filter
-    u           = -Lt*x;                                    % derive control input from control law
-    TX(:,ti)    = A*x + B*u;                                % update next state, no sampled noise
+    u           = -Lt*x;                                            % derive control input from control law
+    TX(:,ti)    = A*x + B*u;                                        % update next state, no sampled noise
     if exist('Pert','var')
         [TX(:,ti),Pert] = OFC_ApplyPerturbation(ti,TX(:,ti),Pert);  % apply tstep-state perturbation
     end
