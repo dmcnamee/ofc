@@ -248,7 +248,7 @@ for pg=1:3
     %plot
     subplot(2,3,pg+3); hold on;
     OFC_SubPlot(TXC,'Position');
-    title(sprintf('Target 1 @ %.2fs, Sum(cost) = %.2f',Tgoal(1),sum(QXC)));
+    title(sprintf('Target 1 @ %.2fs, Sum(cost) = %.2f',Tgoal1Range(tiAdj),sum(QXC)));
     
     
     % elemental - optimal adjusted timing
@@ -268,7 +268,7 @@ for pg=1:3
     %plot
     subplot(2,3,pg); hold on;
     OFC_SubPlot(TXE,'Position');
-    title(sprintf('Target 1 @ %.2fs, Sum(cost) = %.2f',Tgoal(1),sum(QXE)));
+    title(sprintf('Target 1 @ %.2fs, Sum(cost) = %.2f',Tgoal1Range(tiAdj),sum(QXE)));
 end
 suptitle('OT | Perturbation (Time > 0)');
 
