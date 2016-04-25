@@ -16,7 +16,7 @@ units        = {'cm','cm/s','cm/s$^2$'};
 lim.Position = plim; lim.Velocity = vlim; lim.Actuation = alim;
 
 %% plot settings
-OFC_PlotSettings();
+% OFC_PlotSettings(); % should be run where figure() is called
 
 %% set component to be plotted
 i    = find(ismember(components,component));
