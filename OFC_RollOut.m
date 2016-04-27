@@ -18,7 +18,7 @@ function [TX,QX] = OFC_RollOut(x,L,K,A,B,H,R,Q,varargin)
 % OUTPUTS:  TX          = time x state matrix
 %           QX          = time x cost matrix
 % NOTES:    N/A
-% ISSUES:   Use Kalman filter for optimal estimation.
+% ISSUES:   N/A
 % REFS:     Todorov2002
 % AUTHOR:   Daniel McNamee, daniel.c.mcnamee@gmail.com
 

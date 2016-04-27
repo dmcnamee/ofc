@@ -8,7 +8,7 @@ function S = OFC_StateSpace()
 % AUTHOR:   Daniel McNamee, daniel.c.mcnamee@gmail.com
 
 %% variables
-global pres vres ures plim vlim ulim psteps vsteps usteps mdim;
+global pres vres ures plim vlim ulim psteps vsteps usteps;
 
 P1 = plim(1,1):pres:plim(1,2);
 P2 = plim(2,1):pres:plim(2,2);

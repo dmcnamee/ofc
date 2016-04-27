@@ -190,7 +190,7 @@ if isempty(tf)
     tf = 10;
 end
 if isempty(smdelay)
-    smdelay = 0.04;
+    smdelay = 0.05;
 end
 if isempty(tres)
     tres = 0.02;
@@ -254,14 +254,14 @@ if isempty(tinit)
 end
 
 %% dependent variables
+if isempty(xinit)
+    xinit   = [zeros(1,3*mdim) reshape(pgoal',1,ngoal*mdim)]';  % initial state
+end
 OFC_GlobalVars();
 
 %% dependent defaults
 if isempty(Tgoal)
     Tgoal   = T(ceil((1:ngoal)*(tsteps/ngoal)));                % regular interval goal-times
-end
-if isempty(xinit)
-    xinit   = [zeros(1,3*mdim) reshape(pgoal',1,ngoal*mdim)]';  % initial state
 end
 if isempty(wgoal)
     wgoal   = ones(1,ngoal);                                    % weights for goal-targets
