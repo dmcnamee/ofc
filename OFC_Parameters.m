@@ -17,7 +17,8 @@ function params = OFC_Parameters(varargin)
 %           b         = viscous constant, default = 10 N.s/m
 %           tau       = time constant of linear filter, default = 50ms
 %           m         = mass of hand, default = 1kg
-%           tf        = time constant for actuator, default = 50ms
+%           tf        = time constant for actuator, default = 40ms
+%           smdelay   = sensorimotor delay, default = 50ms
 %           tres      = time resolution (step size) for discretization, default = 0.02s
 %           pres      = position resolution (step size) for discretization, default = 0.2cm
 %           vres      = velocity resolution (step size) for discretization, default = 3.33cm/s
@@ -51,7 +52,7 @@ global xinit tinit mdim;
 global plim vlim ulim alim;
 global tres pres vres ures;
 global pgoal wgoal goalsize ngoal;
-global b tau m tf;
+global b tau m tf smdelay;
 global tsteps psteps vsteps usteps;
 global c1 c2 C usigma psigma vsigma asigma ssigma;
 global Wenergy Wtime Wstop Wactuator Wgoal Wtimeout;
@@ -98,6 +99,8 @@ while ~isempty(varargin)
             m = varargin{2};
         case 'tf'
             tf = varargin{2};
+        case 'smdelay'
+            smdelay = varargin{2};
         case 'tres'
             tres = varargin{2};
         case 'pres'
@@ -186,6 +189,9 @@ end
 if isempty(tf)
     tf = 10;
 end
+if isempty(smdelay)
+    smdelay = 0.04;
+end
 if isempty(tres)
     tres = 0.02;
 end
@@ -229,7 +235,7 @@ if isempty(Wstop)
     Wstop = 100;
 end
 if isempty(Wactuator)
-    Wactuator = 0.1;
+    Wactuator = 0.01;
 end
 if isempty(Wgoal)
     Wgoal = 100;

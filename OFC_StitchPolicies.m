@@ -1,6 +1,6 @@
 function [L,K] = OFC_StitchPolicies(ti,L1,K1,L2,K2)
 %% FUNCTION: "Stitches" two control policies together.
-% INPUTS:   ti          = tstep index of stitch
+% INPUTS:   ti      = tstep index of stitch
 %           [L1,K1] = first control policy and Kalman filter
 %           [L2,K2] = second control policy and Kalman filter
 % OUTPUTS:  [L,K]   = combined control policy and Kalman filter

@@ -8,11 +8,12 @@ function [piOpt,KpiOpt,TOpt] = OFC_LQGSDN_OptimizeTiming(TMod,TgoalRange,A,B,C,H
 % NOTES:    N/A
 % ISSUES:   Adapt to multiple TMods.
 %           Can only handle one perturbation.
+%           Incorporate sensorimotor delay into main dynamics.
 % REFS:     N/A
 % AUTHOR:   Daniel McNamee, daniel.c.mcnamee@gmail.com
 
 %% variables
-global xdim xinit ngoal Tgoal;
+global xdim xinit ngoal Tgoal tres smdelay;
 
 while ~isempty(varargin)
     switch varargin{1}
@@ -25,6 +26,8 @@ while ~isempty(varargin)
     end
       varargin(1:2) = [];
 end
+
+smdelayi = ceil(smdelay/tres);
 
 %% defaults
 if ~exist('Chunks','var')
@@ -49,15 +52,15 @@ end
 
 %% perturbed case
 sumQOpt = inf;
-if all(Pert.P.X(:) ~= 0)
+if all(Pert.P.X.pulse(:) ~= 0)
     % identify perturbation timepoint for policy stitching
     TX          = OFC_RollOut(xinit,piOpt,KpiOpt,A,B,H,R,Q);                                % roll out
     tiStitch    = find(sum(abs(TX-ones(rows(TX),1)*Pert.C.X),2)<Pert.Th.X);                 % estimate expected time of perturbation
 
     for ti=1:numel(TgoalRange)
-        Tgoal(TMod) = TgoalRange(ti);
-        [pi,Kpi] = OFC_LQGSDN_Chunked(Chunks,xinit,A,B,C,H,O,R,Q);                          % compute policy for stitching after perturbation
-        [piAdj,KpiAdj]  = OFC_StitchPolicies(tiStitch,piOpt,KpiOpt,pi,Kpi);                 % stitch adjusted policy
+        Tgoal(TMod)     = TgoalRange(ti);
+        [pi,Kpi]        = OFC_LQGSDN_Chunked(Chunks,xinit,A,B,C,H,O,R,Q);                   % compute adjusted policy for stitching after perturbation
+        [piAdj,KpiAdj]  = OFC_StitchPolicies(tiStitch+smdelayi,piOpt,KpiOpt,pi,Kpi);        % stitch adjusted policy with sensorimotor delay
         [TXAdj,QXAdj]   = OFC_RollOut(xinit,piAdj,KpiAdj,A,B,H,R,Q,'Perturbations',Pert);   % rollout and measure experienced cost of stitched policy
         sumQ            = sum(QXAdj);
 
