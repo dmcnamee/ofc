@@ -14,7 +14,7 @@ params      = OFC_Parameters('pgoal',pgoal,'smdelay',smdelay);
 Chunks      = [1 1];
 OFC_PlotSettings();
 trajVar = 'Position'; % trajectory variable to plot (e.g. 'Velocity')
-
+trajVar = 'Velocity';
 % define state-based perturbation
 global xinit xdim;
 Pert.C.X            = nan(xdim,1);
@@ -49,4 +49,4 @@ suplabel('Chunked | Elemental','x');
 suptitle(sprintf('Test - Perturbed OFC Trajectories'));
 
 %% save
-savefig(h,'sim_test.fig');
+% savefig(h,'sim_test.fig');

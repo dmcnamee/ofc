@@ -18,11 +18,11 @@ function [pi,Kpi,V] = OFC_LQGSDN(x,A,B,C,H,O,R,Q)
 
 %% variables
 global tsteps mdim xdim optThresh initDiff maxIter;
-L = zeros(mdim,xdim,tsteps);
-K = zeros(xdim,xdim,tsteps);
-Knew = zeros(mdim,xdim,tsteps); Lnew = zeros(mdim,xdim,tsteps);
-iter = 0;
-diff = initDiff;
+L       = zeros(mdim,xdim,tsteps);
+K       = zeros(xdim,xdim,tsteps);
+Knew    = zeros(mdim,xdim,tsteps); Lnew = zeros(mdim,xdim,tsteps);
+iter    = 0;
+diff    = initDiff;
 
 %% iterate
 tic;

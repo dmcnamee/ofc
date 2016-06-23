@@ -1,9 +1,9 @@
 %% FUNCTION: OFC simulations for Task 1 - learning motor Chunks and 
-%%           solving perturbations for 2-vpoints at varying angles.
+%%           solving force perturbations for 2-vpoints at varying angles.
 % INPUTS:   N/A
 % OUTPUTS:  N/A
 % NOTES:    Only optimizing over first via-point timing.
-% ISSUES:   N/A
+% ISSUES:   Apply forces as sin-wave force perturbations.
 % REFS:     N/A
 % AUTHOR:   Daniel McNamee, daniel.c.mcnamee@gmail.com
 
