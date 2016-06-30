@@ -17,3 +17,6 @@ slprj/
 
 # Session info
 octave-workspace
+
+# Don’t track figures
+*.fig
