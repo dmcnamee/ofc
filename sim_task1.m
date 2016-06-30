@@ -8,7 +8,7 @@
 % AUTHOR:   Daniel McNamee, daniel.c.mcnamee@gmail.com
 
 %% settings
-clear all; close all; clc; 
+clear all; close all; clc;
 % polar grid
 r       = 7;
 angles  = 0:pi/4:7/4*pi;
