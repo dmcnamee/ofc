@@ -11,7 +11,7 @@ function params = OFC_Parameters(varargin)
 %           vlim      = [-xlim +xlim;-ylim +ylim], default = [0 80; 0 80]
 %           ulim      = [-xlim +xlim;-ylim +ylim], default = [0 1500; 0 1500] cm/s^2
 %           alim      = [-xlim +xlim;-ylim +ylim], default = [0 100; 0 100] cm/s^2
-%           pgoal     = [ngoals x mdim] goal-target positions, default = [0 10; -5 20]
+%           pgoal     = [ngoal x mdim] goal-target positions, default = [0 10; -5 20]
 %           wgoal     = weights of goal-targets, default = ones(size(pgoal,1),1)
 %           goalsize  = size of goal-targets, default = 1cm
 %           b         = viscous constant, default = 10 N.s/m

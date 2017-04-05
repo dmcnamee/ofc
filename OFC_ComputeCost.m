@@ -19,7 +19,8 @@ else
 end
 
 if isnan(q)
-    error('OFC_ComputeCost: nan returned.');
+%     error('OFC_ComputeCost: nan returned.');
+    disp('OFC_ComputeCost: nan returned.');
 end
 
 end

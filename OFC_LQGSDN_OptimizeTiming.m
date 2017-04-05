@@ -8,6 +8,7 @@ function [piOpt,KpiOpt,TOpt] = OFC_LQGSDN_OptimizeTiming(TMod,TgoalRange,A,B,C,H
 % NOTES:    N/A
 % ISSUES:   Adapt to multiple TMods.
 %           Can only handle one perturbation.
+%           Check if statement for perturbation.
 %           Incorporate sensorimotor delay into main dynamics.
 % REFS:     N/A
 % AUTHOR:   Daniel McNamee, daniel.c.mcnamee@gmail.com
@@ -52,7 +53,7 @@ end
 
 %% perturbed case
 sumQOpt = inf;
-if all(Pert.P.X.pulse(:) ~= 0)
+if all(Pert.P.X.pulse(:) ~= 0)      % ???
     % identify perturbation timepoint for policy stitching
     TX          = OFC_RollOut(xinit,piOpt,KpiOpt,A,B,H,R,Q);                                % roll out
     tiStitch    = find(sum(abs(TX-ones(rows(TX),1)*Pert.C.X),2)<Pert.Th.X);                 % estimate expected time of perturbation

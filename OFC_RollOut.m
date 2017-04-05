@@ -61,7 +61,8 @@ for ti=2:tsteps
     end
     
     if any(isnan(TX(:)))
-        error('OFC_RollOut: nan returned.');
+%         error('OFC_RollOut: nan returned.');
+        disp('OFC_RollOut: nan returned.');
     end
 end
 

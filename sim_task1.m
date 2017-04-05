@@ -46,7 +46,7 @@ plim = [-20 20; -5 20];
 % define state-based perturbation
 Pert.C.X        = nan(xdim,1);
 Pert.Th.X(1)    = 0.5;
-Pert.C.X(2,1)   = 3.0;             % if norm(y,Pert.C.X(2,1)) < Pert.Th.X(1), apply Pert.P.X(3)
+Pert.C.X(2,1)   = 3.0;              % if norm(y,Pert.C.X(2,1)) < Pert.Th.X(1), apply Pert.P.X(3)
 Pert.P.X.pulse  = zeros(xdim,1);
 
 % dynamics
@@ -62,7 +62,9 @@ for g=1:ng
     TgoalRange{g} = TgoalMin(g):TgoalRes:TgoalMax(g);         % s, range of Tgoal to test
 end
 
-%% plot OFC trajectories (figure = vpoint config, interleaved rows of elemental/chunked solution, col iterates over perturbations)
+%% plot OFC trajectories (figure = vpoint config,
+% interleaved rows of elemental/chunked solution,
+% col iterates over perturbations)
 h.mainfig   = figure();
 h.tabgroup  = uitabgroup(h.mainfig);
 for m=1:nm                              % figure iteration
@@ -75,7 +77,7 @@ for m=1:nm                              % figure iteration
         % elemental
         [piOptE,KpiOptE,TOptE]  = OFC_LQGSDN_OptimizeTiming(TMod,TgoalRange{TMod},A,B,C,H,O,R,Q,'Perturbations',Pert);
         [TXE,QXE]               = OFC_RollOut(xinit,piOptE,KpiOptE,A,B,H,R,Q,'Perturbations',Pert);
-        subplot(2,np,p); hold on;       %plot
+        subplot(2,np,p); hold on;       % plot
         OFC_SubPlot(TXE,trajVar);
         title(sprintf('%.1fV | @%.2fs | C=%.1e',perts(p),TOptE,sum(QXE)),'FontSize',13);
         
