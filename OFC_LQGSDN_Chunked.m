@@ -15,6 +15,8 @@ function [pi,Kpi,V] = OFC_LQGSDN_Chunked(Chunks,x,A,B,C,H,O,R,Q)
 % NOTES:    N/A
 % ISSUES:   Need to re-compute velocity/position based on stitched elemental LQRs.
 %           Remove passing of R,Q since recomputed anyway?
+%           Enable 'Chunks' functionality for specifying only some of the between target
+%           segments e.g. only the first movement
 % REFS:     Todorov2002* / Liu2007
 % AUTHOR:   Daniel McNamee, daniel.c.mcnamee@gmail.com
 

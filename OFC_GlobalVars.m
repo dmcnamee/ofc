@@ -10,7 +10,7 @@ function vars = OFC_GlobalVars()
 %           xdim        = dimensionality of state variable x (incl. sensorimotor delay)
 %           smdsteps    = number of discrete time steps in sensorimotor delay
 % NOTES:    N/A
-% ISSUES:   N/A
+% ISSUES:   N/A  % **HRS in xdim definition: no stopping vel or force constraint?
 % REFS:     Todorov2002 / Liu2007
 % AUTHOR:   Daniel McNamee, daniel.c.mcnamee@gmail.com
 
@@ -34,7 +34,7 @@ vsteps      = (vlim(:,2)-vlim(:,1))/vres + 1;
 usteps      = (ulim(:,2)-ulim(:,1))/ures + 1;
 ngoal       = size(pgoal,1);
 smdsteps    = ceil(smdelay/tres);  
-xdim        = 3*mdim +smdsteps*3*mdim + ngoal*mdim;                             % current state, delayed feedback states, task goals
+xdim        = 3*mdim +smdsteps*3*mdim + ngoal*mdim;     % current state, delayed feedback states, task goals
 if numel(xinit) ~= xdim
     xinit       = [repmat(xinit(1:3*mdim),smdsteps+1,1); xinit(3*mdim+1:end)];  % adapt xinit to incorporate smdelay
 end

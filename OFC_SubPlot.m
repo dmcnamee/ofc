@@ -37,5 +37,6 @@ if strcmp(comp,'Position')
 end
 xlabel(sprintf('X %s (%s)',comp,unit)); ylabel(sprintf('Y %s (%s)',comp,unit));
 title(comp);
+axis equal;
 
 end
