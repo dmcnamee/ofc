@@ -14,7 +14,7 @@ params      = OFC_Parameters('pgoal',pgoal,'smdelay',smdelay);
 Chunks      = [1 1];
 OFC_PlotSettings();
 trajVar = 'Position'; % trajectory variable to plot (e.g. 'Velocity')
-trajVar = 'Velocity';
+%trajVar = 'Velocity';
 % define state-based perturbation
 global xinit xdim;
 Pert.C.X            = nan(xdim,1);
@@ -32,14 +32,15 @@ Pert.P.X.pulse(3)   = 20.0;
 %% compute OFC trajectories
 h = figure();
 % chunked
-[pi,Kpi,V] = OFC_LQGSDN_Chunked(Chunks,xinit,A,B,C,H,O,R,Q);
-[TX,QX]    = OFC_RollOut(xinit,pi,Kpi,A,B,H,R,Q,'Perturbations',Pert);
+[pi,Kpi,V] = OFC_LQGSDN_Chunked(Chunks,xinit,A,B,C,H,O,R,Q);  % calculate OFC gains (L, K) for unperturbed movements
+[TX,QX]    = OFC_RollOut(xinit,pi,Kpi,A,B,H,R,Q,'Perturbations',Pert); % apply OFC gains from unperturbed movements to perturbed movements
 subplot(1,2,1); hold on;
 OFC_SubPlot(TX,trajVar);
 title(sprintf('%.1fV | EC=%.1e',Pert.P.X.pulse(3),V),'FontSize',14);
 
 % elemental
-[pi,Kpi,V] = OFC_LQGSDN_Elemental(xinit,A,B,C,H,O,R,Q);
+Chunks = [1 0; 0 1];
+[pi,Kpi,V] = OFC_LQGSDN_Chunked(Chunks,xinit,A,B,C,H,O,R,Q);
 [TX,QX]    = OFC_RollOut(xinit,pi,Kpi,A,B,H,R,Q,'Perturbations',Pert);
 subplot(1,2,2); hold on;
 OFC_SubPlot(TX,trajVar);
