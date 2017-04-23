@@ -23,48 +23,10 @@ function [TX,QX] = OFC_RollOut(x,L,K,A,B,H,R,Q,varargin)
 % AUTHOR:   Daniel McNamee, daniel.c.mcnamee@gmail.com
 
 %% variables
-while ~isempty(varargin)
-    switch varargin{1}
-        case 'Perturbations'
-            Pert = varargin{2};
-        case 'Plot'
-            plot = varargin{2};
-        otherwise
-            error(['Unexpected option: ' varargin{1}])
-    end
-      varargin(1:2) = [];
-end
-if ~exist('plot','var')
-    plot = false;
-end
-global tsteps T mdim xdim;
-TX = zeros(xdim,tsteps);    % discretized time/state-space
-if numel(x)==mdim           % extend to include target positions
-    global xinit;
-    x = [x xinit(3*mdim+1:xdim)]';
-end
+global tsteps T;
 
-%% init time/state-space
-TX(:,1)        = x;
-if exist('Pert','var')
-    [TX(:,1),Pert] = OFC_ApplyPerturbation(1,TX(:,1),Pert);         % apply perturbation
-end
-
-for ti=2:tsteps
-    Lt          = squeeze(L(:,:,ti));                               % corresponding feedback control gain
-    x           = TX(:,ti-1);                                       % set current state
-    % optimal estimation using Kalman filter
-    u           = -Lt*x;                                            % derive control input from control law
-    TX(:,ti)    = A*x + B*u;                                        % update next state, no sampled noise
-    if exist('Pert','var')
-        [TX(:,ti),Pert] = OFC_ApplyPerturbation(ti,TX(:,ti),Pert);  % apply tstep-state perturbation
-    end
-    
-    if any(isnan(TX(:)))
-%         error('OFC_RollOut: nan returned.');
-        disp('OFC_RollOut: nan returned.');
-    end
-end
+%% roll out trajectory
+TX = TrajectoryRollOut(x,L,K,A,B,H,varargin{:});
 
 %% compute cost trajectory
 QX = zeros(1,tsteps);
@@ -76,7 +38,4 @@ end
 %% output diagnostics
 fprintf('OFC_RollOut: cumulative cost = %.3f.\n',sum(QX));
 
-%% plot
-if plot
-    OFC_Plot(TX,varargin{:});
 end
