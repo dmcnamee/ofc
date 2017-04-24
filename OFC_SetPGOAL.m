@@ -9,6 +9,7 @@ function OFC_SetPGOAL(pgoalNew)
 
 global xinit pgoal ngoal mdim;
 pgoal = pgoalNew;
+OFC_GlobalVars(); % set variable dimensions based on ngoal
 xinit = [xinit(1:6)' reshape(pgoal',1,ngoal*mdim)]';
 
 end

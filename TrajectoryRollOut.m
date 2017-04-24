@@ -64,7 +64,7 @@ end
 
 %% plot
 if plot
-    OFC_Plot(TX,varargin{:});
+    OFC_Plot(TX,'L',L,varargin{:});
 end
 
 end

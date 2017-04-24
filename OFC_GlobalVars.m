@@ -1,4 +1,4 @@
-function vars = OFC_GlobalVars()
+function OFC_GlobalVars()
 %% FUNCTION: Globalizes and returns DEPENDENT global variables for OFC.
 % INPUTS:   varargin    = {pass parameters explicitly}
 % OUTPUTS:  T           = discretized time-space
