@@ -61,6 +61,8 @@ for c=1:nchunk
     pi(:,:,Ti)  = piC{c};
     TIinit      = TIinit + tstepsC;
 end
+pi = pi(:,:,1:tsteps);
+Kpi = Kpi(:,:,1:tsteps); % double-check correct size, sometimes extra timestep added at join
 
 %% compute cost-to-go
 V = sum(VC);

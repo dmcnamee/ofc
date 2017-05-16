@@ -1,11 +1,14 @@
-function TX = TrajectoryRollOut(x,L,K,A,B,H,varargin)
-%% FUNCTION: Roll out trajectory TX under control law L and sensory filter K.
+function TX = TrajectorySample(x,L,K,A,B,C,H,O,sigma,varargin)
+%% FUNCTION: Samples trajectory TX WITH NOISE under control law L and sensory filter K.
 % INPUTS:   x           = initial state
 %           L           = control law
 %           K           = Kalman filter
 %           A           = state-evolution matrix
 %           B           = control-input matrix
+%           C           = signal-dependent noise
 %           H           = sensory-indicator matrix
+%           O           = sensory noise covariance matrix ("Omega")
+%           sigma       = variance of Wiener process
 %           Pert.TX     = explicit tstep-state specification of perturbations (tsteps x 3*mdim)
 %           Pert.Th.T   = threshold for T constraints
 %           Pert.Th.X   = threshold for X constraints
@@ -18,6 +21,9 @@ function TX = TrajectoryRollOut(x,L,K,A,B,H,varargin)
 % ISSUES:   N/A
 % REFS:     Todorov2002
 % AUTHOR:   Daniel McNamee, daniel.c.mcnamee@gmail.com
+
+%% settings
+time_buffer = 0.2; % percentage of trials to omit noise (end of movement)
 
 %% variables
 while ~isempty(varargin)
@@ -46,20 +52,29 @@ if exist('Pert','var')
     [TX(:,1),Pert] = OFC_ApplyPerturbation(1,TX(:,1),Pert);         % apply perturbation
 end
 
-for ti=2:tsteps
-    Lt          = squeeze(L(:,:,ti));                               % corresponding feedback control gain
-    x           = TX(:,ti-1);                                       % set current state
-    % optimal estimation using Kalman filter
-    u           = -Lt*x;                                            % derive control input from control law
-    TX(:,ti)    = A*x + B*u;                                        % update next state, no sampled noise
-    if exist('Pert','var')
-        [TX(:,ti),Pert] = OFC_ApplyPerturbation(ti,TX(:,ti),Pert);  % apply tstep-state perturbation
+TXnans = true; % sample trajectories without nans
+while TXnans
+    for ti=2:tsteps
+        Lt          = squeeze(L(:,:,ti));                               % corresponding feedback control gain
+        x           = TX(:,ti-1);                                       % set current state
+        u           = -Lt*x;                                            % derive control input from control law
+        if tsteps-ti>tsteps*time_buffer
+            noise(ti)   = normrnd(0,sigma);                                 % sample of noise
+        else
+            % don't inject noise toward end of movement (Liu 2007)
+            noise(ti) = 0;
+        end
+        TX(:,ti)    = A*x + B*u + noise(ti)*sum(sum(u.*C.*u,1),3)';     % state evolution (no noise), signal-dependent noise
+        if exist('Pert','var')
+            [TX(:,ti),Pert] = OFC_ApplyPerturbation(ti,TX(:,ti),Pert);  % apply tstep-state perturbation
+        end
     end
-    
     if any(isnan(TX(:)))
-%         error('TrajectoryRollOut: nan returned.');
-        disp('TrajectoryRollOut: nan returned.');
-    end
+        TXnans = true;
+%         disp('TrajectorySample: nan returned.');
+    else
+        TXnans = false;
+    end  
 end
 
 %% plot

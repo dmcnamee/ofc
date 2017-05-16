@@ -39,5 +39,4 @@ C       = zeros(2,mdim,mdim);
 C(1,1,1) = c1; C(1,2,2) = c1; C(1,:,:) = B*squeeze(C(1,:,:));
 C(2,2,1) = -c2; C(2,1,2) = c2; C(2,:,:) = B*squeeze(C(2,:,:));
 
-
 end

@@ -38,6 +38,7 @@ end
 if ~exist('nsamp','var')
     nsamp = 1000;
 end
+debug_plots = false;
 
 %% variables
 global mdim xdim tsteps;
@@ -52,21 +53,45 @@ for s=1:nsamp
     T(1:6,:,s) = TX(1:6,:);
     
     % record gains
-    for m=1:mdim
-        u = -squeeze(L(m,:,:)).*TX;
-        U(m,:,s) = sum(u,1); % sum over state-space
+%     for m=1:mdim
+%         u = -squeeze(L(m,:,:)).*TX;
+%         U(m,:,s) = sum(u,1); % sum over state-space
+%     end
+%     
+    % record gains,
+    % looped over timestep, copied from TrajectoryRollOut
+    for ti=1:tsteps
+        Lt          = squeeze(L(:,:,ti));
+        x           = TX(:,ti);
+        U(:,ti,s)    = -Lt*x;    
     end
 end
+
+
 
 %% compute state probability density
 % Tflat = reshape(T,mdim*3,[]);
 % [NS, edges, midpoints, ~] = histcn(Tflat');
-% pS  = (NS+eps)./max(NS+eps);
+% pS  = (NS+eps)/sum(NS(:)+eps);
+
+%% eliminate outliers at "stitch", temp solution
+U(U<-50) = nan;
+U(U>50) = nan;
 
 %% compute control probability density
 Uflat = reshape(U,mdim,[]);
 [NU, edges, midpoints, ~] = histcn(Uflat');
-pU  = (NU+eps)./max(NU+eps);
+pU  = (NU+eps)/sum(NU(:)+eps);
 
+%% debug plots
+if debug_plots
+    figure(); hold on;
+    for m=1:mdim
+        for t=1:tsteps
+            mu(m,t) = mean(U(m,t,:));
+        end
+        plot(1:tsteps,mu(m,:));
+    end
+end
 
 end
