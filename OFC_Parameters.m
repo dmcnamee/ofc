@@ -5,21 +5,24 @@ function params = OFC_Parameters(varargin)
 %           initDiff  = initial difference in L
 %           maxIter   = maximum number of iterations
 %           xinit     = initial position-velocity-actuator state of the system and goal-target positions, default = (0,...,0) column
+%           pinit     = initial position state of system, default = [0,0]
+%           vinit     = initial velocity state of system, default = [0,0]
 %           tinit     = initial time of system, default = 0
 %           mdim      = dimensionality of plane of movement, default = 2
 %           plim      = [-xlim +xlim;-ylim +ylim], default = [-15 15; 0 30]
 %           vlim      = [-xlim +xlim;-ylim +ylim], default = [0 80; 0 80]
 %           ulim      = [-xlim +xlim;-ylim +ylim], default = [0 1500; 0 1500] cm/s^2
 %           alim      = [-xlim +xlim;-ylim +ylim], default = [0 100; 0 100] cm/s^2
-%           pgoal     = [ngoal x mdim] goal-target positions, default = [0 10; -5 20]
+%           pgoal     = [ngoals x mdim] goal-target positions, default = [0 10; -5 20]
+%           vgoal     = [1 x mdim] final goal-target velocities, default = [0 0]
 %           wgoal     = weights of goal-targets, default = ones(size(pgoal,1),1)
-%           goalsize  = size of goal-targets, default = 1cm
+%           goalsize  = size of goal-targets, default = 1cm, not currently used
 %           b         = viscous constant, default = 10 N.s/m
 %           tau       = time constant of linear filter, default = 50ms
 %           m         = mass of hand, default = 1kg
-%           tf        = time constant for actuator, default = 40ms
+%           tf        = time constant for actuator, default = 40ms - not currently used, use 'tau' instead
 %           smdelay   = sensorimotor delay, default = 50ms
-%           tres      = time resolution (step size) for discretization, default = 0.02s
+%           tres      = time resolution (step size) for discretization, default = 0.01s
 %           pres      = position resolution (step size) for discretization, default = 0.2cm
 %           vres      = velocity resolution (step size) for discretization, default = 3.33cm/s
 %           ures      = acceleration resolution (step size) for discretization, default = 166.67cm/s^2
@@ -30,7 +33,7 @@ function params = OFC_Parameters(varargin)
 %           vsigma    = std of velocity noise, default = 10cm/s
 %           asigma    = std of actuator noise, default = 1N
 %           ssigma    = std of overall sensory noise (scales other noise terms), default = 0.5
-%           Wenergy   = weight of energy in cost function, default = 0.00005
+%           Wenergy   = weight of energy in cost function, default =0.00005 ***(this is small because task requires larger control signals to dea lwith perturbations, but we can try diff valuesc - Todorov '02)
 %           Wtime     = weight of time taken in cost function, default = 20
 %           Wstop     = weight of stopping in cost function, default = 1
 %           Wactuator = weight of actuation in cost function, default = 0.1
@@ -40,25 +43,27 @@ function params = OFC_Parameters(varargin)
 %           vthresh   = maximum allowed velocity at final target, vthresh = 5 cm/s
 %           xdim      = dimensionality of state variable X
 %           Tgoal     = discrete times at which via-points-goals are traversed (assumed regular intervals)
+%           Tatgoal   = minimum dwell time at each via-point-goal (does not require zero velocity)
 % NOTES:    N/A
 % ISSUES:   alim vs ulim?
 % REFS:     Todorov2002 / Liu2007
 % AUTHOR:   Daniel McNamee, daniel.c.mcnamee@gmail.com
-
+% EDITED:   Hannah Sheahan, sheahan.hannah@gmail.com (Oct-2017)
+                                                                                
 %% set parameters as global variables
 % clearvars -global;
 global optThresh initDiff maxIter;
-global xinit tinit mdim;
+global xinit pinit vinit tinit mdim;
 global plim vlim ulim alim;
 global tres pres vres ures;
-global pgoal wgoal goalsize ngoal;
+global pgoal vgoal wgoal goalsize ngoal;
 global b tau m tf smdelay;
 global tsteps psteps vsteps usteps;
 global c1 c2 C usigma psigma vsigma asigma ssigma;
 global Wenergy Wtime Wstop Wactuator Wgoal Wtimeout;
 global tmax vthresh;
 global xdim;
-global T Tgoal;
+global T Tgoal Tatgoal;
 
 %% setup
 while ~isempty(varargin)
@@ -73,6 +78,10 @@ while ~isempty(varargin)
             maxIter = varargin{2};
         case 'xinit'
             xinit = varargin{2};
+        case 'pinit'
+            pinit = varargin{2};
+        case 'vinit'
+            vinit = varargin{2};
         case 'tinit'
             tinit = varargin{2};
         case 'mdim'
@@ -85,10 +94,14 @@ while ~isempty(varargin)
             ulim = varargin{2};
         case 'pgoal'
             pgoal = varargin{2};
+        case 'vgoal'
+            vgoal = varargin{2};
         case 'wgoal'
             wgoal = varargin{2};
         case 'Tgoal'
             Tgoal = varargin{2};
+        case 'Tatgoal'
+            Tatgoal = varargin{2};
         case 'goalsize'
             goalsize = varargin{2};
         case 'b'
@@ -163,7 +176,7 @@ if isempty(plim)
     plim = [-10 10; -5 25];
 end
 if isempty(vlim)
-    vlim = [-40 40; -40 40];
+    vlim = [-80 80; -80 80];
 end
 if isempty(ulim)
     ulim = [-700 700; -700 700];
@@ -174,6 +187,9 @@ end
 if isempty(pgoal)
     pgoal = [0 10; -5 20];
 end
+if isempty(vgoal)
+    vgoal = [0 0];
+end
 if isempty(goalsize)
     goalsize = 1;
 end
@@ -181,19 +197,19 @@ if isempty(b)
     b = 10;
 end
 if isempty(tau)
-    tau = 0.05;
+    tau = 0.04;
 end
 if isempty(m)
     m = 1;
 end
 if isempty(tf)
-    tf = 10;
+    tf = 0.04;
 end
 if isempty(smdelay)
     smdelay = 0.05;
 end
 if isempty(tres)
-    tres = 0.02;
+    tres = 0.01;
 end
 if isempty(pres)
     pres = 0.2;
@@ -232,13 +248,13 @@ if isempty(Wtime)
     Wtime = 0.01;
 end
 if isempty(Wstop)
-    Wstop = 100;
+    Wstop = 1;
 end
 if isempty(Wactuator)
-    Wactuator = 0.01;
+    Wactuator = 0.1;
 end
 if isempty(Wgoal)
-    Wgoal = 100;
+    Wgoal = 100;  
 end
 if isempty(Wtimeout)
     Wtimeout = 0;
@@ -252,21 +268,29 @@ end
 if isempty(tinit)
     tinit = 0;
 end
-
+if isempty(pinit)
+    pinit = [0,0];
+end
+if isempty(vinit)
+    vinit = [0,0];
+end
 %% dependent variables
 if isempty(xinit)
-    xinit   = [zeros(1,3*mdim) reshape(pgoal',1,ngoal*mdim)]';  % initial state
+    xinit   = [pinit vinit zeros(1,mdim) reshape(pgoal',1,ngoal*mdim) reshape(vgoal',1,mdim)]';  % initial state
 end
+
 OFC_GlobalVars();
 
 %% dependent defaults
 if isempty(Tgoal)
     Tgoal   = T(ceil((1:ngoal)*(tsteps/ngoal)));                % regular interval goal-times
 end
+if isempty(Tatgoal)
+    Tatgoal = zeros(1,ngoal);                                   % minimum time spent at goal-targets
+end
 if isempty(wgoal)
     wgoal   = ones(1,ngoal);                                    % weights for goal-targets
 end
-
 %% save variables to struct
 params = ws2struct();
 try

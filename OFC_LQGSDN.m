@@ -1,4 +1,4 @@
-function [pi,Kpi,V] = OFC_LQGSDN(x,A,B,C,H,O,R,Q)
+function [pi,Kpi,V] = OFC_LQGSDN(x,A,B,C,H,O,R,Q,varargin)
 %% FUNCTION: OFC LQGSDN solution based on iterative Kalman filter/ control law optimization.
 % INPUTS:   x = initial state of system
 %           A = state-evolution matrix
@@ -15,7 +15,8 @@ function [pi,Kpi,V] = OFC_LQGSDN(x,A,B,C,H,O,R,Q)
 % ISSUES:   Use structures for dynamics matrices etc.
 % REFS:     Todorov2002* / Liu2007
 % AUTHOR:   Daniel McNamee, daniel.c.mcnamee@gmail.com
-
+% EDITED:   Hannah Sheahan, sheahan.hannah@gmail.com (May-2017)
+                         
 %% variables
 global tsteps mdim xdim optThresh initDiff maxIter;
 L       = zeros(mdim,xdim,tsteps);
@@ -23,6 +24,20 @@ K       = zeros(xdim,xdim,tsteps);
 Knew    = zeros(mdim,xdim,tsteps); Lnew = zeros(mdim,xdim,tsteps);
 iter    = 0;
 diff    = initDiff;
+
+%% default print settings
+while ~isempty(varargin)
+    switch varargin{1}
+        case 'display'
+            display = varargin{2};
+        otherwise
+            error(['Unexpected option: ' varargin{1}])
+    end
+      varargin(1:2) = [];
+end
+if exist('display','var')==0
+    display = 1;
+end
 
 %% iterate
 tic;
@@ -49,9 +64,10 @@ Kpi = K;
 V   = OFC_LQGSDN_CostToGo(x,Gx1,Ge1,Sx1,Se1,s1);
 
 %% diagnostics
-%disp(Lold); disp(Lnew);
-fprintf('OFC_LQGSDN: '); toc;
-fprintf('OFC_LQGSDN: #iterations until convergence = %i, with diff(L) = %.3f.\n',iter,diff(end));
-% fprintf('OFC_LQFSDN: expected cost-to-go = %.3f.\n',V);
-
+if  display
+    %disp(Lold); disp(Lnew);
+    fprintf('OFC_LQGSDN: '); toc;
+    fprintf('OFC_LQGSDN: #iterations until convergence = %i, with diff(L) = %.3f.\n',iter,diff(end));
+    % fprintf('OFC_LQFSDN: expected cost-to-go = %.3f.\n',V);
+end
 end
