@@ -6,15 +6,18 @@ function Qt = OFC_TaskConstraintCostMatrix(t,Q)
 % NOTES:    N/A
 % REFS:     Todorov2002*
 % AUTHOR:   Daniel McNamee, daniel.c.mcnamee@gmail.com
+% EDITED:   Hannah Sheahan, sheahan.hannah@gmail.com (Oct-2017)
 
 %% variables
-global Tgoal wgoal xdim;
+global Tgoal Tatgoal tres wgoal xdim;
 ti      = time2tstep(t);
-Tgoali  = arrayfun(@time2tstep,Tgoal);
+Tgoali  = arrayfun(@time2tstep,Tgoal);                      % timestep index for the goal to be hit
+tstepsatgoal = ceil(Tatgoal./tres);
+atgoal = ((Tgoali-ti)>=0) & ((Tgoali-ti)<=tstepsatgoal);    % should be at goal for this required time
+goali = find(atgoal.*(wgoal~=0));
 
-goali = find((ti==Tgoali).*(wgoal~=0));     % test whether via-point-goal within same time-step AND has a non-zero weight (necessary for LQGSDN_Chunked)
-if goali
-    Qt = squeeze(Q(goali,:,:));             % via-point reward
+if goali  
+    Qt = squeeze(Q(goali,:,:));                             % via-point reward
 else
     Qt = zeros(xdim,xdim);
 end
