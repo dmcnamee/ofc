@@ -260,7 +260,7 @@ if isempty(Wtimeout)
     Wtimeout = 0;
 end
 if isempty(tmax)
-    tmax = 1;
+    tmax = 0.8;
 end
 if isempty(vthresh)
     vthresh = 5;
